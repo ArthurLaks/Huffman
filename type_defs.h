@@ -10,7 +10,8 @@ of deques of bits, it defines a functor to serve as a hash function for a sequen
 #include <unordered_map>
 #include <algorithm>
 #include <unordered_set>
-typedef std::deque<bool> bitstring;
+#include <vector>
+typedef std::vector<bool> bitstring;
 typedef std::unordered_map<short int,bitstring> encoding_t;
 
 //A functor that defines a function for bitstrings.  It converts the sequence of bits as if it was a binary number

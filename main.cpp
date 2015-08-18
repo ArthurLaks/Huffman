@@ -75,8 +75,8 @@ int main(int argc,char* argv[]){
             }else{
                 cout << static_cast<char>(cpair.first) << '\t';
             }
-            for(auto cBit:cpair.second){
-                cout << cBit;
+            for(unsigned counter = 0;counter < cpair.second.size();++counter){
+                cout << cpair.second[counter];
             }
             cout << endl;
         }
@@ -118,8 +118,8 @@ int main(int argc,char* argv[]){
                 cout << "EOF:\t";
             else
                 cout << static_cast<char>(c_pair.second) << ":\t";
-            for(auto c_bit:c_pair.first){
-                cout << c_bit;
+            for(unsigned counter = 0;counter < c_pair.first.size();++counter){
+                cout << c_pair.first[counter];
             }
             cout << endl;
         }

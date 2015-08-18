@@ -29,14 +29,17 @@ struct Node{
 encoding_t transverse(Node*);
 encoding_t create_encoding(unordered_map<short int,size_t> frequencies){
     //The priority queue is sorted by frequency, so the node less frequency will be on top.
-    priority_queue<Node*,std::vector<Node*>,std::function<bool(Node*,Node*)> >
-        frequency_queue([](Node* a,Node* b){return *b < *a;},std::vector<Node*>());
+    priority_queue<Node*,std::vector<Node*>,std::function<bool(Node*,Node*)> > frequency_queue(
+            [](Node* a,Node* b){return *b < *a;},
+            std::vector<Node*>());
 
-
+    //Create nodes for each character with the character and its frequency.
     for(auto cFrequency:frequencies){
         frequency_queue.push(new Node(cFrequency.first,cFrequency.second));
     }
 
+    //Reduce the size of the priority queue to 1 by removing the least frequent two nodes, combining them under one
+    //parent, and inserting that into the queue.
     while(frequency_queue.size() > 1){
         Node* nodeA = frequency_queue.top();
         frequency_queue.pop();
@@ -47,18 +50,22 @@ encoding_t create_encoding(unordered_map<short int,size_t> frequencies){
         frequency_queue.push(parent);
     }
     Node* tree = frequency_queue.top();
-    return transverse(tree);
+    encoding_t encoding =  transverse(tree);
+    for(auto iter = encoding.begin();iter != encoding.end();++iter){
+        std::reverse(iter->second.begin(),iter->second.end());
+    }
+    return encoding;
 }
 
 encoding_t transverse(Node* node){
     if(node->one){
             auto zeroes = transverse(node->zero);
             for(auto iter = zeroes.begin();iter != zeroes.end();++iter){
-                iter->second.push_front(false);
+                iter->second.push_back(false);
             }
             auto ones = transverse(node->one);
             for(auto iter = ones.begin();iter != ones.end();++iter){
-                iter->second.push_front(true);
+                iter->second.push_back(true);
             }
             zeroes.insert(ones.begin(),ones.end());
             delete node;
