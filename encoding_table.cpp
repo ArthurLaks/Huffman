@@ -16,18 +16,14 @@ void write_table(std::ofstream& destination,const encoding_t& encoding){
     destination.write(&max_bytes,1);
 
     for(auto map_iter = encoding.begin();map_iter != encoding.end();++map_iter){
-        //Save the EOF character for the end of the table.
-        if(map_iter->first == EOF){
-            continue;
-        }
-        destination.put(static_cast<unsigned char>(map_iter->first));
+
+        destination.put(map_iter->first);
         //Write the character and then the sequence of bits used to represent the character.
         write_bitstring(destination,max_bytes,map_iter->second);
 
     }
     //Mark the end of the table by repeating the first character in it.
     destination.put(static_cast<unsigned char>(encoding.begin()->first));
-    write_bitstring(destination,max_bytes,encoding.at(EOF));
 
 }
 void write_bitstring(std::ofstream& dest,size_t max_bytes,const bitstring& str){
@@ -46,7 +42,7 @@ void write_bitstring(std::ofstream& dest,size_t max_bytes,const bitstring& str){
 }
 
 bitstring read_bitstring(std::ifstream& source,size_t max_length);
-std::unordered_map<bitstring,short int> read_table(std::ifstream& source){
+decoding_t read_table(std::ifstream& source){
     decoding_t retval;
 
     //The first character of the file is the number of bits in each encoding.
@@ -56,15 +52,14 @@ std::unordered_map<bitstring,short int> read_table(std::ifstream& source){
     unsigned char first_char = source.peek();
     //For each entry in the table, write the character and the sequence of bits to the map.
     while(true){
-        unsigned char character = source.get();
+        char character = source.get();
 
         //The repetition of the first character from the table is the signal that the table is over.
         if(!retval.empty() && character == first_char){
             break;
         }
-        retval.insert(std::make_pair(read_bitstring(source,max_length),static_cast<unsigned int>(character)));
+        retval.insert(std::make_pair(read_bitstring(source,max_length),character));
     }
-    retval.insert(std::make_pair(read_bitstring(source,max_length),EOF));
     return retval;
 }
 

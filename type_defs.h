@@ -12,7 +12,7 @@ of deques of bits, it defines a functor to serve as a hash function for a sequen
 #include <unordered_set>
 #include <vector>
 typedef std::vector<bool> bitstring;
-typedef std::unordered_map<short int,bitstring> encoding_t;
+typedef std::unordered_map<char,bitstring> encoding_t;
 
 //A functor that defines a function for bitstrings.  It converts the sequence of bits as if it was a binary number
 //except that it insert a 1 at the beginning.
@@ -26,6 +26,6 @@ struct hash<bitstring>{
     }
 };
 }
-typedef std::unordered_map<bitstring,short int>  decoding_t;
+typedef std::unordered_map<bitstring,char>  decoding_t;
 typedef std::unordered_set<bitstring> bitstring_set;
 #endif // TYPE_DEFS_H_

@@ -58,23 +58,19 @@ int main(int argc,char* argv[]){
         ifstream input_file(argv[2],ios::in);   //The second argument is the name of the input file.
 
         //Count the frequency of each character in the file.
-        unordered_map<short int,size_t> frequencies;
+        unordered_map<char,size_t> frequencies;
         //For each character in the file, increment the frequency
         for(istreambuf_iterator<char> input_file_iterator(input_file);
                 input_file_iterator != std::istreambuf_iterator<char>();++input_file_iterator){
             frequencies[*input_file_iterator]++;
         }
-        frequencies[EOF] = 1;
         //The create_encoding function returns an unordered_map of characters to deques of bools which represent
         //the encoding of the characters.
         auto encoding = create_encoding(frequencies);
         cout << "Here is the encoding: " << endl;
         for(auto cpair:encoding){
-            if(cpair.first == EOF){
-                cout << "EOF:\t";
-            }else{
+
                 cout << static_cast<char>(cpair.first) << '\t';
-            }
             for(unsigned counter = 0;counter < cpair.second.size();++counter){
                 cout << cpair.second[counter];
             }
@@ -114,10 +110,7 @@ int main(int argc,char* argv[]){
         auto encoding = read_table(input_file);
         cout << "Here is the encoding:" << endl;
         for(auto c_pair:encoding){
-            if(c_pair.second == EOF)
-                cout << "EOF:\t";
-            else
-                cout << static_cast<char>(c_pair.second) << ":\t";
+            cout << static_cast<char>(c_pair.second) << ":\t";
             for(unsigned counter = 0;counter < c_pair.first.size();++counter){
                 cout << c_pair.first[counter];
             }
@@ -135,13 +128,9 @@ int main(int argc,char* argv[]){
         //The ibitstream class defines an implicit conversion to bool that returns true as long as there is valid
         //to read.
         while(input_file_stream){
-            short current_char = encoding[input_file_stream.extract()];
-            if(current_char == EOF)
-                return 0;
-            output_file << static_cast<char>(current_char);
+            char current_char = encoding[input_file_stream.extract()];
+            output_file << current_char;
         }
-    std::cerr << "Invalid file!" << endl;
-    return 1;
     }
     return 0;
 }

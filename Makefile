@@ -3,7 +3,7 @@ huffman: main.o
 	g++ $(FLAGS) -o huffman main.o create_encoding.o obitstream.o \
 ibitstream.o encoding_table.o
 main.o: main.cpp create_encoding.o obitstream.o ibitstream.o encoding_table.o
-	g++ $(FLAGS) -c -o main.o -DDEGUG main.cpp
+	g++ $(FLAGS) -c -o main.o  main.cpp
 create_encoding.o: create_encoding.cpp create_encoding.h type_defs.h
 	g++ $(FLAGS) -c -o create_encoding.o create_encoding.cpp
 
