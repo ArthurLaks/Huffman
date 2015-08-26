@@ -1,5 +1,4 @@
 #include <algorithm>
-#include <iostream>
 #include "ibitstream.h"
 
 using std::ifstream;
@@ -48,7 +47,6 @@ bitstring ibitstream::extract(){
     if(retval.size() > max_length){
         bad_bit = true;
         retval.clear();
-        std::cerr << "Invalid sequence detected." << std::endl;
     }
     return retval;
 }

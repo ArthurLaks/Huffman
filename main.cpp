@@ -69,7 +69,6 @@ int main(int argc,char* argv[]){
         //Write magic number to file.
         output_file.write(MAGIC_NUMBER,MG_LEN);
         compress_file(input_file,output_file);
-        return 0;
     //If the user choose to decompress a file
     }else{
         ifstream input_file(argv[2],ios::binary | ios::in);
@@ -81,16 +80,18 @@ int main(int argc,char* argv[]){
         //Determine if the magic number is correct.
         char mg_buffer[MG_LEN];
         input_file.read(mg_buffer,MG_LEN);
+	//If the magic number is incorrect.
         if(memcmp(mg_buffer,MAGIC_NUMBER,MG_LEN) != 0){
             cerr << "Invalid file type. " << endl;
             return 1;
         }
+	//If the decompress_file function failed then the file is corrupt.
         if(!decompress_file(input_file,output_file)){
-            cerr << "Invalid file.";
-            return 1;
-        }else
-            return 0;
+            cerr << "The file is corrupt.";
+            return 2;
+	}
     }
+    return 0;
 }
 
 void compress_file(ifstream& input_file,ofstream& output_file){
@@ -104,17 +105,10 @@ void compress_file(ifstream& input_file,ofstream& output_file){
     //The create_encoding function returns an unordered_map of characters to deques of bools which represent
     //the encoding of the characters.
     auto encoding = create_encoding(frequencies);
-    cout << "Here is the encoding: " << endl;
-    for(auto cpair:encoding){
-        cout << cpair.first << '\t';
-        for(unsigned counter = 0;counter < cpair.second.size();++counter){
-            cout << cpair.second[counter];
-        }
-        cout << endl;
-    }
+
     //Find the least frequent character in the file, and use that as the EOF character.
     char eof_char;
-    size_t freq = -1;
+    size_t freq = -1;   //-1 is the highest value that can be stored in an unsigned type.
     for(auto& c_pair:frequencies){
         if(c_pair.second < freq){
             eof_char = c_pair.first;
@@ -138,6 +132,7 @@ void compress_file(ifstream& input_file,ofstream& output_file){
     for(istreambuf_iterator<char> input_file_iter(input_file);
             input_file_iter != istreambuf_iterator<char>();++input_file_iter){
         char c_char = *input_file_iter;
+        //If the character is the same as is used to mark the end of the file, write it twice to escape it.
         if(c_char == eof_char){
             output_file_stream.insert(encoding[c_char]);
         }
@@ -148,19 +143,12 @@ void compress_file(ifstream& input_file,ofstream& output_file){
 }
 
 bool decompress_file(ifstream& input_file,ofstream& output_file){
-//Decompress the file.
 
     //Read the encoding table from the file.
     //The read_table function returns an unordered_map mapping sequences of bits to characters
     auto encoding = read_table(input_file);
-    cout << "Here is the encoding:" << endl;
-    for(auto c_pair:encoding){
-        cout << static_cast<char>(c_pair.second) << ":\t";
-        for(unsigned counter = 0;counter < c_pair.first.size();++counter){
-            cout << c_pair.first[counter];
-        }
-        cout << endl;
-    }
+
+    //The eof character is the one after the table.
     char eof_char = input_file.get();
     //The ibitstream class requires a set of valid bitstrings to know when to return the bitstring and when to
     //extract more bits and when it encounters an invalid sequence.
@@ -174,6 +162,7 @@ bool decompress_file(ifstream& input_file,ofstream& output_file){
     //to read.
     while(input_file_stream){
         char current_char = encoding[input_file_stream.extract()];
+        //If the character is the end of file character and it was not escaped then the end of the file was reached.
         if(current_char == eof_char && (!input_file_stream || encoding[input_file_stream.extract()] != eof_char)){
             return true;
         }
